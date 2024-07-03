@@ -15,6 +15,32 @@ function processLine(num: number, state: any): void {
   // Update min and max
   state.maxNum = Math.max(state.maxNum, num);
   state.minNum = Math.min(state.minNum, num);
+
+  updateLongestSequence(num, state.currentIncSeq, state.longestIncSeq, true);
+  updateLongestSequence(num, state.currentDecSeq, state.longestDecSeq, false);
+}
+
+// Update the longest increasing or decreasing sequence
+function updateLongestSequence(
+  num: number,
+  currentSeq: number[],
+  longestSeq: number[],
+  isIncreasing: boolean
+): void {
+  if (
+    currentSeq.length === 0 ||
+    (isIncreasing
+      ? num >= currentSeq[currentSeq.length - 1]
+      : num <= currentSeq[currentSeq.length - 1])
+  ) {
+    currentSeq.push(num);
+  } else {
+    if (currentSeq.length > longestSeq.length) {
+      longestSeq.splice(0, longestSeq.length, ...currentSeq);
+    }
+    currentSeq.length = 0;
+    currentSeq.push(num);
+  }
 }
 
 // Calculate median of the numbers
@@ -41,6 +67,10 @@ async function processFile(filePath: string) {
     minNum: Number.MAX_SAFE_INTEGER,
     sum: 0,
     totalNumbers: 0,
+    longestIncSeq: [],
+    currentIncSeq: [],
+    longestDecSeq: [],
+    currentDecSeq: [],
   };
 
   for await (const line of rl) {
@@ -50,6 +80,10 @@ async function processFile(filePath: string) {
     }
   }
 
+  // Final sequence check
+  checkFinalSequence(state.currentIncSeq, state.longestIncSeq);
+  checkFinalSequence(state.currentDecSeq, state.longestDecSeq);
+
   const mean = state.sum / state.totalNumbers;
   const median = calculateMedian(state.nums);
 
@@ -57,8 +91,24 @@ async function processFile(filePath: string) {
   console.log(`Minimum number: ${state.minNum}`);
   console.log(`Median: ${median}`);
   console.log(`Arithmetic mean: ${mean}`);
+  console.log(
+    `Longest increasing sequence: ${
+      state.longestIncSeq.length
+    } elements, ${state.longestIncSeq.join(", ")}`
+  );
+  console.log(
+    `Longest decreasing sequence: ${
+      state.longestDecSeq.length
+    } elements, ${state.longestDecSeq.join(", ")}`
+  );
 
   console.timeEnd("Total Processing Time");
+}
+
+function checkFinalSequence(currentSeq: number[], longestSeq: number[]): void {
+  if (currentSeq.length > longestSeq.length) {
+    longestSeq.splice(0, longestSeq.length, ...currentSeq);
+  }
 }
 
 processFile("./10m.txt").catch(console.error);
