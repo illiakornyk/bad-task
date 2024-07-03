@@ -13,8 +13,7 @@ interface State {
   currentDecSeq: number[];
 }
 
-// Process each line and update the state
-function processLine(num: number, state: any): void {
+function processLine(num: number, state: State): void {
   state.nums.push(num);
   state.sum += num;
   state.totalNumbers++;
@@ -27,7 +26,6 @@ function processLine(num: number, state: any): void {
   updateLongestSequence(num, state.currentDecSeq, state.longestDecSeq, false);
 }
 
-// Update the longest increasing or decreasing sequence
 function updateLongestSequence(
   num: number,
   currentSeq: number[],
@@ -50,7 +48,6 @@ function updateLongestSequence(
   }
 }
 
-// Calculate median of the numbers
 function calculateMedian(nums: number[]): number {
   const sorted = nums.slice().sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
@@ -120,4 +117,24 @@ function checkFinalSequence(currentSeq: number[], longestSeq: number[]): void {
   }
 }
 
-processFile("./10m.txt").catch(console.error);
+// CLI handling
+function getFilePathFromArgs(): string | null {
+  const args = process.argv;
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--file" && i + 1 < args.length) {
+      return args[i + 1];
+    }
+  }
+  return null;
+}
+
+const filePath = getFilePathFromArgs();
+if (!filePath) {
+  console.error("Usage: node script.js -- --file <path_to_file>");
+  process.exit(1);
+}
+
+processFile(filePath).catch((error) => {
+  console.error("Error processing file:", error);
+  process.exit(1);
+});
