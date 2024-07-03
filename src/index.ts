@@ -1,9 +1,16 @@
 import * as fs from "fs";
 import * as readline from "readline";
 
-interface SequenceResult {
-  sequence: number[];
-  length: number;
+interface State {
+  nums: number[];
+  maxNum: number;
+  minNum: number;
+  sum: number;
+  totalNumbers: number;
+  longestIncSeq: number[];
+  currentIncSeq: number[];
+  longestDecSeq: number[];
+  currentDecSeq: number[];
 }
 
 // Process each line and update the state
@@ -61,7 +68,7 @@ async function processFile(filePath: string) {
     crlfDelay: Infinity,
   });
 
-  const state = {
+  const state: State = {
     nums: [],
     maxNum: Number.MIN_SAFE_INTEGER,
     minNum: Number.MAX_SAFE_INTEGER,
@@ -75,9 +82,11 @@ async function processFile(filePath: string) {
 
   for await (const line of rl) {
     const num = parseInt(line);
-    if (!isNaN(num)) {
-      processLine(num, state);
+    if (isNaN(num)) {
+      console.error(`Non-numeric data encountered: ${line}`);
+      continue;
     }
+    processLine(num, state);
   }
 
   // Final sequence check
