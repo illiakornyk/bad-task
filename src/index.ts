@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as readline from "readline";
+import { getFilePathFromArgs } from "./cli";
 
 interface State {
   nums: number[];
@@ -115,17 +116,6 @@ function checkFinalSequence(currentSeq: number[], longestSeq: number[]): void {
   if (currentSeq.length > longestSeq.length) {
     longestSeq.splice(0, longestSeq.length, ...currentSeq);
   }
-}
-
-// CLI handling
-function getFilePathFromArgs(): string | null {
-  const args = process.argv;
-  for (let i = 0; i < args.length; i++) {
-    if (args[i] === "--file" && i + 1 < args.length) {
-      return args[i + 1];
-    }
-  }
-  return null;
 }
 
 const filePath = getFilePathFromArgs();
